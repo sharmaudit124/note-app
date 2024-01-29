@@ -4,6 +4,7 @@ import com.udit.noteapp.dtos.AuthDTO;
 import com.udit.noteapp.dtos.LoginDTO;
 import com.udit.noteapp.dtos.SignUpDTO;
 import com.udit.noteapp.entities.User;
+import com.udit.noteapp.exception.BadCredentialException;
 import com.udit.noteapp.repositories.UserRepository;
 import com.udit.noteapp.services.AuthenticationService;
 import com.udit.noteapp.services.JwtService;
@@ -11,10 +12,12 @@ import com.udit.noteapp.utils.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.udit.noteapp.constants.ExceptionConstants.BAD_CREDENTIALS_FOUND;
 import static com.udit.noteapp.constants.ExceptionConstants.USERNAME_NOT_FOUND;
 
 @Service
@@ -39,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         var jwt = jwtService.generateToken(user);
-
+        //TODO: add refreshToken
         return AuthDTO.builder()
                 .userId(user.getUserId())
                 .userName(user.getUsername())
@@ -50,9 +53,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthDTO signIn(LoginDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            throw new BadCredentialException(BAD_CREDENTIALS_FOUND);
+        }
         User user = userRepository.findByUserName(request.getUserName()).orElseThrow(
                 () -> new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND, request.getUserName()))
         );

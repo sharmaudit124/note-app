@@ -1,7 +1,5 @@
 package com.udit.noteapp.utils;
 
-import com.udit.noteapp.services.JwtService;
-import com.udit.noteapp.services.UserService;
 import com.udit.noteapp.services.impl.JwtServiceImpl;
 import com.udit.noteapp.services.impl.UserServiceImpl;
 import jakarta.servlet.FilterChain;

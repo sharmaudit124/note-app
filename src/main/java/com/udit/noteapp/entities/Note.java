@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document("notes")
 @Data
@@ -22,6 +23,8 @@ public class Note {
     private String content;
     @DBRef
     private User author;
+    @DBRef
+    private List<User> sharedWith;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
