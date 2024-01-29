@@ -21,6 +21,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
+    //TODO: add refreshToken
     @Id
     private String userId;
     private String fullName;

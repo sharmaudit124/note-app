@@ -24,7 +24,7 @@ public class UserUtil {
     }
 
     public void checkIfStrongPassword(String password) {
-        if (!Pattern.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,16}", password)) {
+        if (!Pattern.matches("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,16}", password)) {
             throw new WeakPasswordException(WEAK_PASSWORD_FOUND);
         }
     }

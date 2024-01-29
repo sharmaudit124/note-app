@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.udit.noteapp.constants.JWTConstants.JWT_EXPIRATION_TIME;
+import static com.udit.noteapp.constants.JWTConstants.ACCESS_TOKEN_EXPIRATION_TIME;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -48,7 +48,7 @@ public class JwtServiceImpl implements JwtService {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 

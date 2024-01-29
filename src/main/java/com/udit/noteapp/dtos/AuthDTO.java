@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class AuthDTO {
+    //TODO:Add @JsonView here
     private String userId;
     private String userName;
     private String accessToken;
