@@ -15,7 +15,7 @@ public class JWTConstants {
      * Refresh tokens are used to obtain new access tokens without requiring the user to re-enter their credentials.
      * Default value: 30 days.
      */
-    public static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30;
+    public static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 30;
 
     private JWTConstants() {
     }

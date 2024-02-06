@@ -10,16 +10,14 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NoteDTO {
+public class CreateNoteDTO {
     private String title;
     private String content;
-    private String authorId;
     private Set<String> sharedWith;
 
-    public NoteDTO(Note note) {
+    public CreateNoteDTO(Note note) {
         this.title = note.getTitle();
         this.content = note.getContent();
-        this.authorId = note.getAuthor().getUserId();
         this.sharedWith = note.getSharedWith();
     }
 }

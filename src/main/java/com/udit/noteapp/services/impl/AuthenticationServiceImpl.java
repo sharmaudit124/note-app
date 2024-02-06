@@ -12,6 +12,7 @@ import com.udit.noteapp.utils.UserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,6 +50,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(jwt)
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public String getAuthenticatedUser(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return user.getUserId();
     }
 
     @Override

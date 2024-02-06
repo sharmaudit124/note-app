@@ -1,6 +1,6 @@
 package com.udit.noteapp.exception;
 
-public class BadCredentialException extends RuntimeException{
+public class BadCredentialException extends RuntimeException {
     public BadCredentialException(String message) {
         super(message);
     }
