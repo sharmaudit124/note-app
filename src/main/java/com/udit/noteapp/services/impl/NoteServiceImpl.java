@@ -8,7 +8,6 @@ import com.udit.noteapp.exception.EntityNotFoundException;
 import com.udit.noteapp.repositories.NoteRepository;
 import com.udit.noteapp.services.NoteService;
 import com.udit.noteapp.utils.UserUtil;
-import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<NoteDTO> getAllNotes(String userName) {
         userUtil.checkIfUserNotExistElseGet(userName);
-        return noteRepository.findByAuthorId(userName).stream()
+        return noteRepository.findByAuthor(userName).stream()
                 .map(NoteDTO::new)
                 .collect(Collectors.toList());
     }
@@ -44,7 +43,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDTO getNoteById(String noteId, String userName) {
         userUtil.checkIfUserNotExistElseGet(userName);
-        Optional<Note> optionalNote = noteRepository.findByIdAndAuthorId(noteId, userName);
+        Optional<Note> optionalNote = noteRepository.findByNoteIdAndAuthor(noteId, userName);
 
         if (optionalNote.isEmpty()) {
             throw new EntityNotFoundException(NOTE_WITH_ID_NOT_FOUND);
@@ -57,6 +56,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDTO createNote(CreateNoteDTO noteDTO, String userName) {
         User user = userUtil.checkIfUserNotExistElseGet(userName);
+        //TODO:check if shared note user is present in DB
         Note note = noteRepository.save(
                 Note.builder()
                         .author(user)
@@ -72,7 +72,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDTO updateNote(String noteId, NoteDTO noteDTO, String userName) {
         userUtil.checkIfUserNotExistElseGet(userName);
-        Optional<Note> optionalNote = noteRepository.findByIdAndAuthorId(noteId, userName);
+        Optional<Note> optionalNote = noteRepository.findByNoteIdAndAuthor(noteId, userName);
         if (optionalNote.isEmpty()) {
             throw new EntityNotFoundException(NOTE_WITH_ID_NOT_FOUND);
         }
@@ -87,7 +87,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void deleteNote(String noteId, String userName) {
         userUtil.checkIfUserNotExistElseGet(userName);
-        Optional<Note> optionalNote = noteRepository.findByIdAndAuthorId(noteId, userName);
+        Optional<Note> optionalNote = noteRepository.findByNoteIdAndAuthor(noteId, userName);
         if (optionalNote.isEmpty()) {
             throw new EntityNotFoundException(NOTE_WITH_ID_NOT_FOUND);
         }
@@ -95,14 +95,14 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public void shareNote(String noteId, String shareWithUser, String userName) {
+    public NoteDTO shareNote(String noteId, String shareWithUser, String userName) {
         if (userName.equals(shareWithUser)) {
             throw new IllegalArgumentException(NOTE_WITH_THEMSELVES);
         }
 
         userUtil.checkIfUsersExists(List.of(userName, shareWithUser));
 
-        Optional<Note> optionalNote = noteRepository.findByIdAndAuthorId(noteId, userName);
+        Optional<Note> optionalNote = noteRepository.findByNoteIdAndAuthor(noteId, userName);
         if (optionalNote.isEmpty()) {
             throw new EntityNotFoundException(NOTE_WITH_ID_NOT_FOUND);
         }
@@ -110,15 +110,13 @@ public class NoteServiceImpl implements NoteService {
         Set<String> sharedWithSet = note.getSharedWith();
         sharedWithSet.add(shareWithUser);
         note.setSharedWith(sharedWithSet);
-        noteRepository.save(note);
+        return new NoteDTO(noteRepository.save(note));
     }
 
     @Override
     public List<NoteDTO> searchByText(String searchText, String userName) {
-        userUtil.checkIfUserNotExistElseGet(userName);
-        TextCriteria textCriteria = TextCriteria.forDefaultLanguage()
-                .matchingAny(searchText);
-        var res = noteRepository.findByAuthorIdAndTextSearch(userName, textCriteria);
+        User user = userUtil.checkIfUserNotExistElseGet(userName);
+        List<Note> res = noteRepository.findByAuthorAndTextSearch(user.getUserId(), searchText);
         return res.stream()
                 .map(NoteDTO::new)
                 .collect(Collectors.toList());

@@ -1,7 +1,7 @@
 package com.udit.noteapp.repositories;
 
 import com.udit.noteapp.entities.Note;
-import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,9 +10,14 @@ import java.util.Optional;
 
 @Repository
 public interface NoteRepository extends MongoRepository<Note, String> {
-    List<Note> findByAuthorId(String userId);
+    List<Note> findByAuthor(String userName);
 
-    Optional<Note> findByIdAndAuthorId(String noteId, String userId);
+    Optional<Note> findByNoteIdAndAuthor(String noteId, String userName);
 
-    List<Note> findByAuthorIdAndTextSearch(String userId, TextCriteria textCriteria);
+    @Aggregation(pipeline = {
+            "{$match: {'author': ?0, $text: { $search: ?1 } }}",
+            "{$sort: {score: { $meta: 'textScore' }}}",
+    })
+    List<Note> findByAuthorAndTextSearch(String userName, String searchText);
+
 }

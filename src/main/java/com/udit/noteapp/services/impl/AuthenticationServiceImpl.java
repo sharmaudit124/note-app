@@ -55,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public String getAuthenticatedUser(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return user.getUserId();
+        return user.getUsername();
     }
 
     @Override
